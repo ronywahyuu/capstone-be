@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id             String           @id @default(cuid())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  email          String           @unique
+  avatarImg      String?
+  name           String?
+  password       String
+  postDonasi     PostDonasi[]
+  postBlog       Blog[]
+  commentsDonasi CommentsDonasi[]
+  commentsBlog   CommentsBlog[]
+}
+
+model PostDonasi {
+  id          String           @id @default(cuid())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  slug        String           @unique
+  title       String
+  description String?
+  linkForm    String?
+  published   Boolean          @default(false)
+  author      User?            @relation(fields: [authorId], references: [id])
+  authorId    String?
+  comments    CommentsDonasi[]
+
+  @@index([authorId])
+}
+
+model CommentsDonasi {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  comment   String
+  post      PostDonasi @relation(fields: [postId], references: [id])
+  postId    String
+  author    User?      @relation(fields: [authorId], references: [id])
+  authorId  String?
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+model Blog {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  slug      String         @unique
+  title     String
+  body      String?
+  published Boolean        @default(false)
+  author    User?          @relation(fields: [authorId], references: [id])
+  authorId  String?
+  comments  CommentsBlog[]
+
+  @@index([authorId])
+}
+
+model CommentsBlog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  comment   String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  blogId    String
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  String?
+
+  @@index([blogId])
+  @@index([authorId])
+}
