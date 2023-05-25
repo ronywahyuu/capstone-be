@@ -27,6 +27,7 @@ import postRoutes from "./route/posts-routes";
 import userRoutes from "./route/user-routes";
 import commentDonasi from "./route/comment-donasi-routes"
 import { protect } from "./utils/auth";
+import path from "path";
 
 // define API v1 routes
 const url = "/api/v1";
@@ -36,23 +37,32 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // multer
-const storage = multer.diskStorage({
+const avatarImgStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/avatar");
   },
   filename: (req, file, cb) => {
     const fileName = file.originalname.toLowerCase().split(" ").join("-");
-    cb(null, `${Date.now()}+${fileName}`);
+    cb(null, `${Date.now()}-${fileName}`);
   },
 });
 
-const upload = multer({ storage });
-
-// avatar upload
-app.post("/upload", upload.single("file"), (req, res) => {
-  const file = req.file;
-  res.status(200).json({ message: "file uploaded", file });
+const blogImgStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/blog");
+  },
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.toLowerCase().split(" ").join("-");
+    cb(null, `${Date.now()}${fileName}`);
+  }
 });
+
+// use multer
+app.use(bodyParser.json());
+app.use(multer({storage: avatarImgStorage}).single("file"));
+
+// access media files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(`${url}/users`, userRoutes);
 app.use(`${url}/posts`, postRoutes);
