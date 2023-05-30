@@ -4,10 +4,14 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const posts = await prisma.postDonasi.findMany({});
-    // const posts = await prisma.$queryRaw`
-    //   SELECT * FROM PostDonasi
-    // `
+    // const posts = await prisma.postDonasi.findMany({});
+
+    // get all post with ascending order
+    const posts = await prisma.postDonasi.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     if (!posts) {
       res.status(404).json({ message: "Posts not found" });
@@ -31,6 +35,9 @@ const getPostById = async (req: Request, res: Response) => {
       where: {
         id: id,
       },
+      include: {
+        author: true,
+      },
     });
 
     const comment = await prisma.commentsDonasi.findMany({
@@ -45,7 +52,7 @@ const getPostById = async (req: Request, res: Response) => {
     const authorId = post?.authorId ?? null;
 
     if (!post) {
-      res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Post not found" });
     }
     res.status(200).json({
       post,
@@ -60,6 +67,14 @@ const getPostById = async (req: Request, res: Response) => {
 
 const createPost = async (req: any, res: any) => {
   const { title, description, linkForm } = req.body;
+
+  // file upload
+  // const avatarImg = req.file.path;
+  // const baseUrl = req.protocol + "://" + req.get("host");
+  // if (req.file.path) {
+  //   const postsImgPath = baseUrl + "/uploads/img/" + req.file.filename;
+  // }
+
   try {
     // create post based on authenticated author
     const post = await prisma.postDonasi.create({
@@ -68,6 +83,7 @@ const createPost = async (req: any, res: any) => {
         slug: title.toLowerCase().split(" ").join("-"),
         description,
         linkForm,
+        bannerImg: "https://i.imgur.com/6VBx3io.png",
         authorId: req.user.id,
       },
     });

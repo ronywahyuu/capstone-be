@@ -23,6 +23,7 @@ model User {
   postBlog       Blog[]
   commentsDonasi CommentsDonasi[]
   commentsBlog   CommentsBlog[]
+  savedPost      savedPost[]
 }
 
 model PostDonasi {
@@ -31,12 +32,15 @@ model PostDonasi {
   updatedAt   DateTime         @updatedAt
   slug        String           @unique
   title       String
-  description String?
+  description String?         @db.LongText
+  bannerImg   String?
   linkForm    String?
   published   Boolean          @default(false)
   author      User?            @relation(fields: [authorId], references: [id])
   authorId    String?
   comments    CommentsDonasi[]
+  saved       savedPost[]
+  savedCount  Int              @default(0)
 
   @@index([authorId])
 }
@@ -46,7 +50,7 @@ model CommentsDonasi {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   comment   String
-  post      PostDonasi @relation(fields: [postId], references: [id])
+  post      PostDonasi @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
   author    User?      @relation(fields: [authorId], references: [id])
   authorId  String?
@@ -83,3 +87,17 @@ model CommentsBlog {
   @@index([blogId])
   @@index([authorId])
 }
+
+model savedPost {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  post      PostDonasi @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String     @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+
+  @@index([postId])
+  @@index([userId])
+}
+

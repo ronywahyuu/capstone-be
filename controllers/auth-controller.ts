@@ -8,18 +8,19 @@ const register = async (req: any, res: any) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Please upload an image" });
-    }
-    const avatarImg = req.file.path;
-
-    console.log(req.file);
+    // if (!req.file) {
+    //   return res.status(400).json({ message: "Please upload an image" });
+    // }
+    // const avatarImg = req.file.path;
 
     // base url
     const baseUrl = req.protocol + "://" + req.get("host");
 
+    let avatarImgPath: string | undefined;
     // avatar image path
-    const avatarImgPath = baseUrl + "/uploads/avatar/" + req.file.filename;
+    if (req.file) {
+      avatarImgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+    }
 
     const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
     // const pathToAvatarImg = avatarImg ? avatarImg.path : defaultAvatarImg;
@@ -80,7 +81,11 @@ const login = async (req: Request, res: Response) => {
         httpOnly: true,
       })
       .status(200)
-      .json({ user });
+      .json({
+        message: "User logged in successfully",
+        user,
+        token,
+      });
 
     // res.status(200).json({ user, token });
   } catch (error: any) {
