@@ -29,6 +29,9 @@ import postRoutes from "./route/posts-routes";
 import userRoutes from "./route/user-routes";
 import commentDonasi from "./route/comment-donasi-routes";
 import savedDonasiRoutes from "./route/saved-donasi-routes";
+import blogRoutes from "./route/blog-routes";
+
+
 import { protect } from "./utils/auth";
 import path from "path";
 
@@ -105,6 +108,8 @@ app.use(`${url}/saved`, savedDonasiRoutes);
 
 // comments
 app.use(`${url}/comments/posts`, commentDonasi);
+
+app.use(`${url}/blogs`, blogRoutes );
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
