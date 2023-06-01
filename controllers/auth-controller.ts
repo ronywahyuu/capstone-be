@@ -8,12 +8,6 @@ const register = async (req: any, res: any) => {
   try {
     const { name, email, password } = req.body;
 
-    // if (!req.file) {
-    //   return res.status(400).json({ message: "Please upload an image" });
-    // }
-    // const avatarImg = req.file.path;
-
-    // base url
     const baseUrl = req.protocol + "://" + req.get("host");
 
     let avatarImgPath: string | undefined;
@@ -39,6 +33,7 @@ const register = async (req: any, res: any) => {
       email: user.email,
       avatarImg: user.avatarImg,
     };
+
     res.status(201).json({
       message: "User created successfully",
       user: userData,
@@ -76,6 +71,8 @@ const login = async (req: Request, res: Response) => {
       process.env.JWT_SECRET as string
     );
 
+    const { password: userPassword, ...userData } = user;
+
     res
       .cookie("access_token", token, {
         httpOnly: true,
@@ -83,7 +80,7 @@ const login = async (req: Request, res: Response) => {
       .status(200)
       .json({
         message: "User logged in successfully",
-        user,
+        user : userData,
         token,
       });
 

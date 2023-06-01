@@ -11,6 +11,16 @@ const getAllPosts = async (req: Request, res: Response) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarImg: true,
+          }
+        }
+      }
     });
 
     if (!posts) {
