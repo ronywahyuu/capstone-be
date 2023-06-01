@@ -24,6 +24,7 @@ model User {
   commentsDonasi CommentsDonasi[]
   commentsBlog   CommentsBlog[]
   savedPost      savedPost[]
+  savedBlog      savedBlog[]
 }
 
 model PostDonasi {
@@ -32,7 +33,7 @@ model PostDonasi {
   updatedAt   DateTime         @updatedAt
   slug        String           @unique
   title       String
-  description String?         @db.LongText
+  description String?          @db.LongText
   bannerImg   String?
   linkForm    String?
   published   Boolean          @default(false)
@@ -65,11 +66,14 @@ model Blog {
   updatedAt DateTime       @updatedAt
   slug      String         @unique
   title     String
-  body      String?
+  body      String?        @db.LongText
+  bannerImg String?
   published Boolean        @default(false)
   author    User?          @relation(fields: [authorId], references: [id])
   authorId  String?
   comments  CommentsBlog[]
+  saved     savedBlog[]
+  savedCount Int            @default(0)
 
   @@index([authorId])
 }
@@ -93,7 +97,7 @@ model savedPost {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   post      PostDonasi @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String     @unique
+  postId    String     
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
 
@@ -101,3 +105,15 @@ model savedPost {
   @@index([userId])
 }
 
+model savedBlog {
+  id        String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blog      Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  blogId    String @unique
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  @@index([blogId])
+  @@index([userId])
+}

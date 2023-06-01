@@ -97,7 +97,7 @@ export const deleteSavedDonasi = async (req: Request, res: Response) => {
 
     const savedDonasi = await prisma.savedPost.delete({
       where: {
-        id,
+        id: savedData.id,
       },
     });
 
@@ -114,6 +114,7 @@ export const deleteSavedDonasi = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({
+      message: "Data deleted",
       data: savedDonasi,
     });
   } catch (error: any) {

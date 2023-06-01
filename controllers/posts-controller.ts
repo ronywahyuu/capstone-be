@@ -68,12 +68,14 @@ const getPostById = async (req: Request, res: Response) => {
 const createPost = async (req: any, res: any) => {
   const { title, description, linkForm } = req.body;
 
-  // file upload
-  // const avatarImg = req.file.path;
-  // const baseUrl = req.protocol + "://" + req.get("host");
-  // if (req.file.path) {
-  //   const postsImgPath = baseUrl + "/uploads/img/" + req.file.filename;
-  // }
+  // base url
+  const baseUrl = req.protocol + "://" + req.get("host");
+
+  let imgPath: string | undefined;
+  // avatar image path
+  if (req.file) {
+    imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+  }
 
   try {
     // create post based on authenticated author
@@ -83,7 +85,7 @@ const createPost = async (req: any, res: any) => {
         slug: title.toLowerCase().split(" ").join("-"),
         description,
         linkForm,
-        bannerImg: "https://i.imgur.com/6VBx3io.png",
+        bannerImg: imgPath,
         authorId: req.user.id,
       },
     });
@@ -116,6 +118,15 @@ const updatePost = async (req: any, res: any) => {
       res.status(401).json({ message: "Unauthorized" });
     }
 
+    const baseUrl = req.protocol + "://" + req.get("host");
+
+    let imgPath: string | undefined;
+    // avatar image path
+    if (req.file) {
+      imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+    }
+
+
     const updatedPost = await prisma.postDonasi.update({
       where: {
         id: id,
@@ -125,6 +136,7 @@ const updatePost = async (req: any, res: any) => {
         slug: title.toLowerCase().split(" ").join("-"),
         description,
         linkForm,
+        bannerImg: imgPath,
       },
     });
 

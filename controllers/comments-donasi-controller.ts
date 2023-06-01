@@ -6,10 +6,20 @@ export const createCommentDonasi = async (req: any, res: any) => {
 
 
   try {
-    // res.status(201).json({
-    //   message: "Comment created",
-    //   comment,
-    // });
+    // find first post by id
+    const post = await prisma.postDonasi.findFirst({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    
+
     const newComment = await prisma.commentsDonasi.create({
       data :{
         postId,

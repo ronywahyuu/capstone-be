@@ -1,17 +1,166 @@
 import { Request, Response } from "express";
+import prisma from "../database/config";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-const getAllBlog = async (req: Request, res: Response) => {
+// interface UserPayload {
+//   id: string;
+//   email: string;
+// }
 
-}
+export const getAllBlog = async (req: Request, res: Response) => {
+  try {
+    const blogs = await prisma.blog.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json({
+      length: blogs.length,
+      blogs,
+    });
+  } catch (error) {}
+};
 
-const getBlogById = async (req: Request, res: Response) => {
+export const getBlogById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const blog = await prisma.blog.findFirst({
+      where: {
+        id: id,
+      },
+      include: {
+        author: true,
+      },
+    });
 
-}
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
 
-const createBlog = async (req: Request, res: Response) => {
+    res.status(200).json({
+      blog,
+    });
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+};
 
-}
+export const createBlog = async (req: any, res: any) => {
+  const { title, body } = req.body;
+  // const user = req.user as UserPayload;
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-const updateBlog = async (req: Request, res: Response) => {
-  
-}
+  let bannerImg: string | undefined = undefined;
+  if (req.file) {
+    bannerImg = `${baseUrl}/${req.file.path}`;
+  }
+
+  const storeImg = bannerImg || null;
+
+  try {
+    const blog = await prisma.blog.create({
+      data: {
+        title,
+        slug: title.toLowerCase().split(" ").join("-"),
+        body,
+        bannerImg: storeImg,
+        authorId: req.user.id,
+      },
+    });
+
+    res.status(201).json({
+      message: "Blog created successfully",
+      blog,
+    });
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+};
+
+export const updateBlog = async (req: any, res: Response) => {
+  const { id } = req.params;
+  const { title, body } = req.body;
+  try {
+    const findBlog = await prisma.blog.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!findBlog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    if (findBlog?.authorId !== req.user.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const baseUrl = req.protocol + "://" + req.get("host");
+
+    let imgPath: string | undefined;
+    // avatar image path
+    if (req.file) {
+      imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+    }
+
+    // check user
+
+    const blog = await prisma.blog.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title,
+        slug: title.toLowerCase().split(" ").join("-"),
+        body,
+        bannerImg: imgPath,
+      },
+    });
+
+    res.status(200).json({
+      message: "Blog updated",
+      blog,
+    });
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+};
+
+export const deleteBlog = async (req: any, res: any) => {
+  const { id } = req.params;
+  try {
+    const findBlog = await prisma.blog.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!findBlog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    if (findBlog?.authorId !== req.user.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const blog = await prisma.blog.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Blog deleted",
+      blog,
+    });
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+};
