@@ -1,19 +1,28 @@
 import { Request, Response } from "express";
 import prisma from "../database/config";
+import { User } from "@prisma/client";
 
 const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    // user with type User
+    
     const user = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
+      where: {id},
+      select :{
+        id: true,
+        name: true,
+        email: true,
+        avatarImg: true,
         postDonasi: true,
         postBlog: true,
         savedPost: true,
-      },
+        savedBlog: true,
+      }
     });
+
+
+
     res.status(200).json({ user });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

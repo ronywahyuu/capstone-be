@@ -28,20 +28,22 @@ model User {
 }
 
 model PostDonasi {
-  id          String           @id @default(cuid())
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  slug        String           @unique
-  title       String
-  description String?          @db.LongText
-  bannerImg   String?
-  linkForm    String?
-  published   Boolean          @default(false)
-  author      User?            @relation(fields: [authorId], references: [id])
-  authorId    String?
-  comments    CommentsDonasi[]
-  saved       savedPost[]
-  savedCount  Int              @default(0)
+  id            String           @id @default(cuid())
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  slug          String           @unique
+  title         String
+  description   String?          @db.LongText
+  bannerImg     String?
+  linkForm      String?
+  published     Boolean          @default(false)
+  author        User?            @relation(fields: [authorId], references: [id])
+  authorId      String?
+  comments      CommentsDonasi[]
+  saved         savedPost[]
+  savedCount    Int              @default(0)
+  commentsCount Int              @default(0)
+  likedCount    Int              @default(0)
 
   @@index([authorId])
 }
@@ -61,19 +63,21 @@ model CommentsDonasi {
 }
 
 model Blog {
-  id        String         @id @default(cuid())
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  slug      String         @unique
-  title     String
-  body      String?        @db.LongText
-  bannerImg String?
-  published Boolean        @default(false)
-  author    User?          @relation(fields: [authorId], references: [id])
-  authorId  String?
-  comments  CommentsBlog[]
-  saved     savedBlog[]
-  savedCount Int            @default(0)
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  slug          String         @unique
+  title         String
+  body          String?        @db.LongText
+  bannerImg     String?
+  published     Boolean        @default(false)
+  author        User?          @relation(fields: [authorId], references: [id])
+  authorId      String?
+  comments      CommentsBlog[]
+  saved         savedBlog[]
+  savedCount    Int            @default(0)
+  commentsCount Int            @default(0)
+  likedCount    Int            @default(0)
 
   @@index([authorId])
 }
@@ -97,7 +101,7 @@ model savedPost {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   post      PostDonasi @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String     
+  postId    String
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
 
@@ -106,12 +110,12 @@ model savedPost {
 }
 
 model savedBlog {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  blog      Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
-  blogId    String @unique
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  blogId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
 
   @@index([blogId])

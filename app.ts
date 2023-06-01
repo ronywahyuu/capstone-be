@@ -30,8 +30,8 @@ import userRoutes from "./route/user-routes";
 import commentDonasi from "./route/comment-donasi-routes";
 import savedDonasiRoutes from "./route/saved-donasi-routes";
 import blogRoutes from "./route/blog-routes";
-
-
+import commentBlogRoutes from "./route/comment-blog-routes";
+import savedBlogRoutes from "./route/saved-blog-routes";
 import { protect } from "./utils/auth";
 import path from "path";
 
@@ -103,13 +103,14 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(`${url}/users`, userRoutes);
 app.use(`${url}/posts`, postRoutes);
 
-// saved post
+// posts donasi
 app.use(`${url}/saved`, savedDonasiRoutes);
-
-// comments
 app.use(`${url}/comments/posts`, commentDonasi);
 
-app.use(`${url}/blogs`, blogRoutes );
+// blogs
+app.use(`${url}/blogs`, blogRoutes);
+app.use(`${url}/comments/blogs`, commentBlogRoutes);
+app.use(`${url}/saved/blogs`, savedBlogRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

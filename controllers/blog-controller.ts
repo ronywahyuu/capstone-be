@@ -13,6 +13,16 @@ export const getAllBlog = async (req: Request, res: Response) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarImg: true,
+          }
+        }
+      }
     });
     res.status(200).json({
       length: blogs.length,
@@ -29,7 +39,15 @@ export const getBlogById = async (req: Request, res: Response) => {
         id: id,
       },
       include: {
-        author: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarImg: true,
+          }
+        },
+        comments: true,
       },
     });
 
