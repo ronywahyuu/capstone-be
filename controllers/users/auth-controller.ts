@@ -1,12 +1,25 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
-import { hashPassword } from "../utils/auth";
+import prisma from "../../database/config";
+import { hashPassword } from "../../utils/auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const register = async (req: any, res: any) => {
   try {
     const { name, email, password } = req.body;
+
+    // find if user already exists
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (userExists) {
+      return res.status(400).json({
+        message: "User already exists",
+      });
+    }
 
     const baseUrl = req.protocol + "://" + req.get("host");
 
@@ -16,7 +29,8 @@ const register = async (req: any, res: any) => {
       avatarImgPath = baseUrl + "/uploads/img/" + req.file?.filename;
     }
 
-    const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
+    // const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
+    const defaultAvatarImg = baseUrl + "/uploads/default-avatar.png";
     // const pathToAvatarImg = avatarImg ? avatarImg.path : defaultAvatarImg;
     const user = await prisma.user.create({
       data: {

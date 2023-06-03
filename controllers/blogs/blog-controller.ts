@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 // interface UserPayload {
@@ -163,7 +163,7 @@ export const deleteBlog = async (req: any, res: any) => {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    if (findBlog?.authorId !== req.user.id) {
+    if (req.user.id !== findBlog?.authorId ) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const blog = await prisma.blog.delete({

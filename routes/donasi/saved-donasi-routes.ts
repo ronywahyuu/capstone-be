@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import * as savedDonasiController from "../controllers/saved-donasi-controller";
-import protectRoute from "../middleware/protect-route";
+import * as savedDonasiController from "../../controllers/donasi/saved-donasi-controller";
+import protectRoute from "../../middleware/protect-route";
 
 const router = Router();
 

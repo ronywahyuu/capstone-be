@@ -1,5 +1,5 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 
 export const createCommentDonasi = async (req: any, res: any) => {
   const { comment, postId } = req.body;
@@ -25,6 +25,18 @@ export const createCommentDonasi = async (req: any, res: any) => {
         postId,
         comment,
         authorId : req.user.id
+      }
+    });
+
+    // trigger increase comment count
+    await prisma.postDonasi.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        commentsCount:{
+          increment: 1
+        }
       }
     });
 

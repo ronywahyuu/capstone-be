@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 
 export const getSavedDonasi = async (req: Request, res: Response) => {
   const { userId } = req.body;
@@ -22,7 +22,7 @@ export const getSavedDonasi = async (req: Request, res: Response) => {
   }
 };
 
-export const createSavedDonasi = async (req: Request, res: Response) => {
+export const createSavedDonasi = async (req: any, res: any) => {
   const { userId, postId } = req.body;
   try {
     // if user already saved this post
@@ -36,6 +36,12 @@ export const createSavedDonasi = async (req: Request, res: Response) => {
     if (user) {
       return res.status(400).json({
         message: "User already saved this post",
+      });
+    }
+
+    if (userId !== req.user.id) {
+      return res.status(400).json({
+        message: "User not authorized",
       });
     }
 
@@ -79,7 +85,7 @@ export const createSavedDonasi = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteSavedDonasi = async (req: Request, res: Response) => {
+export const deleteSavedDonasi = async (req: any, res: any) => {
   const { userId, id } = req.body;
   try {
     // if user already saved this post
@@ -92,6 +98,12 @@ export const deleteSavedDonasi = async (req: Request, res: Response) => {
     if (!savedData) {
       return res.status(400).json({
         message: "Data not found",
+      });
+    }
+
+    if (userId !== req.user.id) {
+      return res.status(400).json({
+        message: "User not authorized",
       });
     }
 

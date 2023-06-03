@@ -1,5 +1,5 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 import { Request, Response } from "express";
 
 export const createCommentBlog = async (req: any, res: any) => {

@@ -25,6 +25,8 @@ model User {
   commentsBlog   CommentsBlog[]
   savedPost      savedPost[]
   savedBlog      savedBlog[]
+  likes          LikePostDonasi[]
+  likesBlog      LikeBlog[]
 }
 
 model PostDonasi {
@@ -41,6 +43,7 @@ model PostDonasi {
   authorId      String?
   comments      CommentsDonasi[]
   saved         savedPost[]
+  likes         LikePostDonasi[]
   savedCount    Int              @default(0)
   commentsCount Int              @default(0)
   likedCount    Int              @default(0)
@@ -75,6 +78,7 @@ model Blog {
   authorId      String?
   comments      CommentsBlog[]
   saved         savedBlog[]
+  likes         LikeBlog[]
   savedCount    Int            @default(0)
   commentsCount Int            @default(0)
   likedCount    Int            @default(0)
@@ -87,7 +91,7 @@ model CommentsBlog {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   comment   String
-  blog      Blog     @relation(fields: [blogId], references: [id])
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade )
   blogId    String
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  String?
@@ -117,6 +121,32 @@ model savedBlog {
   blogId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+
+  @@index([blogId])
+  @@index([userId])
+}
+
+model LikePostDonasi {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  post      PostDonasi @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model LikeBlog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  blogId    String
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
 
   @@index([blogId])
   @@index([userId])

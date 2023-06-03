@@ -1,12 +1,14 @@
-import { Request, Response } from "express";
-import prisma from "../database/config";
+import { NextFunction, Request, Response } from "express";
+import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-
-const getAllPosts = async (req: Request, res: Response) => {
+import { imgPathGenerator } from "../../utils/helpers";
+import { PostDonasi } from "@prisma/client";
+export const getAllPosts = async (req: Request, res: Response) => {
   try {
     // const posts = await prisma.postDonasi.findMany({});
 
     // get all post with ascending order
+    // const posts: Promise<PostDonasi> = await DonasiService.getAll();
     const posts = await prisma.postDonasi.findMany({
       orderBy: {
         createdAt: "desc",
@@ -18,13 +20,13 @@ const getAllPosts = async (req: Request, res: Response) => {
             name: true,
             email: true,
             avatarImg: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!posts) {
-      res.status(404).json({ message: "Posts not found" });
+      return res.status(404).json({ message: "Posts not found" });
     }
 
     res.status(200).json({
@@ -38,7 +40,11 @@ const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
-const getPostById = async (req: Request, res: Response) => {
+export const getPostById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
   try {
     const post = await prisma.postDonasi.findFirst({
@@ -62,30 +68,33 @@ const getPostById = async (req: Request, res: Response) => {
     const authorId = post?.authorId ?? null;
 
     if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({
+        error: true,
+        message: "Post not found",
+      });
+      // return new ErrorHandler(404, "Post not found");
     }
     res.status(200).json({
+      error: false,
       post,
       comments: comment,
     });
   } catch (error) {
-    res.status(404).json({ message: "Post not found" });
+    if (error instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({
+        error: true,
+        message: error.message,
+      });
+    }
   } finally {
     await prisma.$disconnect();
   }
 };
 
-const createPost = async (req: any, res: any) => {
+export const createPost = async (req: any, res: any) => {
   const { title, description, linkForm } = req.body;
 
-  // base url
-  const baseUrl = req.protocol + "://" + req.get("host");
-
-  let imgPath: string | undefined;
-  // avatar image path
-  if (req.file) {
-    imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
-  }
+  let imgPath = imgPathGenerator(req, res);
 
   try {
     // create post based on authenticated author
@@ -108,7 +117,7 @@ const createPost = async (req: any, res: any) => {
   }
 };
 
-const updatePost = async (req: any, res: any) => {
+export const updatePost = async (req: any, res: any) => {
   // only author can update post
   const { id } = req.params;
   const { title, description, linkForm } = req.body;
@@ -136,7 +145,6 @@ const updatePost = async (req: any, res: any) => {
       imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
     }
 
-
     const updatedPost = await prisma.postDonasi.update({
       where: {
         id: id,
@@ -161,7 +169,7 @@ const updatePost = async (req: any, res: any) => {
   }
 };
 
-const deletePost = async (req: any, res: any) => {
+export const deletePost = async (req: any, res: any) => {
   // only author can delete post
   const { id } = req.params;
 
@@ -194,5 +202,3 @@ const deletePost = async (req: any, res: any) => {
     }
   }
 };
-
-export { getAllPosts, getPostById, createPost, updatePost, deletePost };

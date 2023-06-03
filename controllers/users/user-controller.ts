@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 import { User } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { imgPathGenerator } from "../../utils/helpers";
 
 const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     // user with type User
-    
+
     const user = await prisma.user.findUnique({
-      where: {id},
-      select :{
+      where: { id },
+      select: {
         id: true,
         name: true,
         email: true,
@@ -18,10 +20,8 @@ const getUser = async (req: Request, res: Response) => {
         postBlog: true,
         savedPost: true,
         savedBlog: true,
-      }
+      },
     });
-
-
 
     res.status(200).json({ user });
   } catch (error: any) {
@@ -33,13 +33,7 @@ const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, email } = req.body;
 
-  const avatarImg = req.file?.path;
-  const baseUrl = req.protocol + "://" + req.get("host");
-
-  // avatar image path
-  const avatarImgPath = baseUrl + "/uploads/img/" + req.file?.filename;
-
-  // const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
+  let imgPath = imgPathGenerator(req, res);
 
   try {
     const user = await prisma.user.update({
@@ -49,12 +43,17 @@ const updateUser = async (req: Request, res: Response) => {
       data: {
         name,
         email,
-        avatarImg: avatarImgPath,
+        avatarImg: imgPath,
       },
     });
-    res.status(200).json({ user });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: error.message });
+    }
   }
 };
 
