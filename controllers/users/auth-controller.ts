@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../database/config";
-import { hashPassword } from "../../utils/auth";
+import { createJWT, hashPassword } from "../../utils/auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -61,6 +61,11 @@ const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Please provide valid email and password" });
+    }
     // check if user exists
     const user = await prisma.user.findUnique({
       where: {
@@ -79,11 +84,22 @@ const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // const token = createJWT(user);
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET as string
-    );
+    const token = createJWT(user);
+
+    // set authorization header
+
+    // const token = jwt.sign(
+    //   {
+    //     id: user.id,
+    //     email: user.email,
+    //     name: user.name,
+    //     avatarImg: user.avatarImg,
+    //   },
+    //   process.env.JWT_SECRET as string,
+    //   {
+    //     expiresIn: "1m",
+    //   }
+    // );
 
     const { password: userPassword, ...userData } = user;
 
@@ -94,9 +110,20 @@ const login = async (req: Request, res: Response) => {
       .status(200)
       .json({
         message: "User logged in successfully",
-        user : userData,
+        user: userData,
         token,
       });
+
+    // res
+    //   .cookie("access_token", token, {
+    //     httpOnly: true,
+    //   })
+    //   .status(200)
+    //   .json({
+    //     message: "User logged in successfully",
+    //     user: userData,
+    //     token,
+    //   });
 
     // res.status(200).json({ user, token });
   } catch (error: any) {
@@ -104,14 +131,58 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.access_token;
+
+    if (!token) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as any;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const newToken = createJWT(user);
+
+    res
+      .cookie("access_token", newToken, {
+        httpOnly: true,
+      })
+      .status(200)
+      .json({ message: "Token refreshed", token: newToken });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const signout = async (req: Request, res: Response) => {
+  // clear cookie
+  const token = req.cookies.access_token;
+
+  if (!token) {
+    return res.status(401).json({ message: "User not authenticated" });
+  }
+
   res
     .clearCookie("access_token", {
       sameSite: "none",
       secure: true,
+      httpOnly: true,
     })
-    .status(200)
+    .status(202)
     .json({ message: "User signed out" });
 };
 
-export { register, login, signout };
+export { register, login, signout, refreshToken };

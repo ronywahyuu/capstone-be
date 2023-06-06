@@ -4,6 +4,9 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { imgPathGenerator } from "../../utils/helpers";
 import { PostDonasi } from "@prisma/client";
 export const getAllPosts = async (req: Request, res: Response) => {
+  // query
+  // const { page, limit } = req.query;
+  const {userId} = req.query;
   try {
     // const posts = await prisma.postDonasi.findMany({});
 
@@ -27,6 +30,16 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
     if (!posts) {
       return res.status(404).json({ message: "Posts not found" });
+    }
+
+    // get mine
+    if (userId) {
+      const mine = posts.filter((post) => post.authorId === userId);
+      return res.status(200).json({
+        message: "Success fetch my posts",
+        length: mine.length,
+        posts: mine,
+      });
     }
 
     res.status(200).json({

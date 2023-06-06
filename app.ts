@@ -11,8 +11,10 @@ const app = express();
 const port = 3000;
 app.use(express.json());
 
+// use all origins
+
 // cors
-app.use(cors());
+// app.use(cors());
 
 app.use(logger);
 
@@ -30,10 +32,17 @@ import likeBlogRoutes from "./routes/blogs/like-blog-routes";
 
 // =================== ROUTES USERS ===================
 import userRoutes from "./routes/users/user-routes";
+import { protect } from "./utils/auth";
 
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// remove cookie from another domain
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}))
 // define API v1 routes
 const url = "/api/v1";
 
@@ -60,6 +69,10 @@ app.use(`${url}/blogs`, blogRoutes);
 app.use(`${url}/comments/blogs`, commentBlogRoutes);
 app.use(`${url}/saved/blogs`, savedBlogRoutes);
 app.use(`${url}/likes/blogs`, likeBlogRoutes);
+
+app.use(`${url}/protected`, protect, (req, res) => {
+  res.status(200).json({ message: "protected" });
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

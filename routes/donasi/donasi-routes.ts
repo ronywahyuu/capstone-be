@@ -5,6 +5,7 @@ import * as donasiController from "../../controllers/donasi/donasi-controller"
 import protectRoute from "../../middleware/protect-route";
 import validate from "../../middleware/validate";
 import SchemaPostDonasiValidator from "../../validators/schema-post-donasi-validator";
+import { protect } from "../../utils/auth";
 
 const router = Router();
 

@@ -18,10 +18,20 @@ const getUser = async (req: Request, res: Response) => {
         avatarImg: true,
         postDonasi: true,
         postBlog: true,
-        savedPost: true,
-        savedBlog: true,
+        savedPost: {
+          select: {
+            post: true,
+          }
+        },
+        savedBlog: {
+
+        },
       },
     });
+
+    if (!user){
+      return res.status(404).json({ message: "User not found" });
+    }
 
     res.status(200).json({ user });
   } catch (error: any) {

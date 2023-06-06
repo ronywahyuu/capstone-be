@@ -13,7 +13,10 @@ const router = Router();
 router.post("/register", validate(SchemaCreateUserValidator), authController.register);
 // login a user
 router.post("/login", authController.login);
-router.delete("/signout", authController.signout);
+router.get("/signout", authController.signout);
+
+// refresh token 
+router.post("/refresh-token", authController.refreshToken);
 
 // get detail user
 router.get("/:id", userController.getUser);

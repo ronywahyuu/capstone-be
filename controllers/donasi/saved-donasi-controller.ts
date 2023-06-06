@@ -63,6 +63,9 @@ export const createSavedDonasi = async (req: any, res: any) => {
         userId,
         postId,
       },
+      include:{
+        post: true
+      }
     });
 
     // trigger update saved count

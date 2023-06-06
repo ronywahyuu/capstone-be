@@ -12,7 +12,7 @@ const protectRoute = (req: any, res: any, next: any) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     req.user = user;
-    const { id, email } = user;
+    const { id, email, name, avatarImg } = user;
     next();
   });
 }
