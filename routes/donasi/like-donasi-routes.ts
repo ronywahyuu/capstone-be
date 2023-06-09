@@ -5,6 +5,7 @@ import * as likeDonasiController from "../../controllers/donasi/like-donasi-cont
 const router = Router()
 
 router.get('/:id', likeDonasiController.getLikeDonasi)
+router.get('/', protectRoute, likeDonasiController.getLikeDonasiByUser)
 router.post('/', protectRoute, likeDonasiController.createLikeDonasi)
 router.delete('/', protectRoute, likeDonasiController.deleteLikeDonasi)
 

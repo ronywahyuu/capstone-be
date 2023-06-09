@@ -24,7 +24,9 @@ const getUser = async (req: Request, res: Response) => {
           }
         },
         savedBlog: {
-
+          select: {
+            blog: true,
+          }
         },
       },
     });

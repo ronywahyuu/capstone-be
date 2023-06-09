@@ -38,11 +38,21 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // remove cookie from another domain
+// app.use(cors({
+
+//   origin: "http://localhost:3000",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true,
+// }))
+
+// access control allow origin cors
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-}))
+}));
+
+
 // define API v1 routes
 const url = "/api/v1";
 
@@ -60,6 +70,7 @@ app.use(`${url}/users`, userRoutes);
 
 // donasi
 app.use(`${url}/posts`, donasiRoutes);
+
 app.use(`${url}/saved`, savedDonasiRoutes);
 app.use(`${url}/comments/posts`, commentDonasi);
 app.use(`${url}/likes/donasi`, likeDonasiRoutes);
@@ -72,7 +83,7 @@ app.use(`${url}/likes/blogs`, likeBlogRoutes);
 
 app.use(`${url}/protected`, protect, (req, res) => {
   res.status(200).json({ message: "protected" });
-})
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

@@ -1,9 +1,22 @@
 import { Request, Response } from "express";
 import prisma from "../../database/config";
 
-export const getSavedDonasi = async (req: Request, res: Response) => {
-  const { userId } = req.body;
+export const getSavedDonasi = async (req: any, res: any) => {
+  const { userId } = req.query;
+  // console.log(req.query);
   try {
+    if (!userId) {
+      return res.status(400).json({
+        message: "User id is required",
+      });
+    }
+
+    if (userId !== req.user.id) {
+      return res.status(401).json({
+        message: "User not authorized to access this data",
+      });
+    }
+
     const savedDonasi = await prisma.savedPost.findMany({
       where: {
         userId,
@@ -22,9 +35,11 @@ export const getSavedDonasi = async (req: Request, res: Response) => {
   }
 };
 
+
 export const createSavedDonasi = async (req: any, res: any) => {
   const { userId, postId } = req.body;
   try {
+    console.log(req.body);
     // if user already saved this post
     const user = await prisma.savedPost.findFirst({
       where: {
@@ -35,6 +50,7 @@ export const createSavedDonasi = async (req: any, res: any) => {
 
     if (user) {
       return res.status(400).json({
+        request: req.body,
         message: "User already saved this post",
       });
     }
@@ -63,9 +79,9 @@ export const createSavedDonasi = async (req: any, res: any) => {
         userId,
         postId,
       },
-      include:{
-        post: true
-      }
+      include: {
+        post: true,
+      },
     });
 
     // trigger update saved count
@@ -89,12 +105,14 @@ export const createSavedDonasi = async (req: any, res: any) => {
 };
 
 export const deleteSavedDonasi = async (req: any, res: any) => {
-  const { userId, id } = req.body;
+  const { userId, postId } = req.body;
+  console.log(req.body);
   try {
     // if user already saved this post
     const savedData = await prisma.savedPost.findFirst({
       where: {
         userId,
+        postId,
       },
     });
 
@@ -133,6 +151,9 @@ export const deleteSavedDonasi = async (req: any, res: any) => {
       data: savedDonasi,
     });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      error: true,
+      message: error.message,
+    });
   }
 };

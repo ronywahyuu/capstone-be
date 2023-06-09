@@ -28,6 +28,7 @@ export const createLikeDonasi = async (req: any, res: any) => {
     const user = await prisma.likePostDonasi.findFirst({
       where: {
         userId,
+        postId,
       },
     });
 
@@ -60,6 +61,48 @@ export const createLikeDonasi = async (req: any, res: any) => {
 
     res.status(201).json({
       message: "Post Liked",
+      like,
+    });
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+};
+
+// get like donasi by current user
+export const getLikeDonasiByUser = async (req: any, res: any) => {
+  const { userId } = req.query;
+  // console.log(req.query);
+  try {
+    if (!userId) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (req.user.id !== userId) {
+      res.status(401).json({ message: "You are not allowed to get this like" });
+      return;
+    }
+    // const postDonasi = await prisma.likePostDonasi.findUnique({
+    //   where: {
+    //     id:userId,
+    //   },
+    // });
+
+    // if (!postDonasi) {
+    //   res.status(404).json({ message: "Post not found" });
+    //   return;
+    // }
+
+    const like = await prisma.likePostDonasi.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Get like by current user",
       like,
     });
   } catch (err) {
@@ -123,6 +166,20 @@ export const deleteLikeDonasi = async (req: any, res: any) => {
       });
     }
 
+    const userLiked = await prisma.likePostDonasi.findFirst({
+      where: {
+        userId,
+        postId,
+      },
+    });
+
+    if (!userLiked) {
+      return res.status(400).json({
+        error: true,
+        message: "You already disliked this post",
+      });
+    }
+
     if (req.user.id !== userId) {
       return res.status(400).json({
         error: true,
@@ -131,25 +188,20 @@ export const deleteLikeDonasi = async (req: any, res: any) => {
     }
 
     // check if user already like this post
-    const user = await prisma.likePostDonasi.findFirst({
-      where: {
-        userId,
-      },
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "You already disliked this post",
-      });
-    }
 
     // delete like
     const like = await prisma.likePostDonasi.delete({
       where: {
-        id: user.id,
+        id: userLiked.id,
       },
     });
+
+    if (post.likedCount === 0) {
+      return res.status(400).json({
+        error: true,
+        message: "Already 0 like",
+      });
+    }
 
     // update like count
     await prisma.postDonasi.update({

@@ -17,6 +17,7 @@ const register = async (req: any, res: any) => {
 
     if (userExists) {
       return res.status(400).json({
+        error: true,
         message: "User already exists",
       });
     }
@@ -62,9 +63,10 @@ const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please provide valid email and password" });
+      return res.status(400).json({
+        error: true,
+        message: "Please provide valid email and password",
+      });
     }
     // check if user exists
     const user = await prisma.user.findUnique({
@@ -73,7 +75,10 @@ const login = async (req: Request, res: Response) => {
       },
     });
     if (!user) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({
+        error: true,
+        message: "User does not exist",
+      });
     }
 
     // check if password is correct
@@ -81,7 +86,10 @@ const login = async (req: Request, res: Response) => {
     const validPassword = await bcrypt.compare(password, user.password);
 
     if (!validPassword) {
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({
+        error: true,
+        message: "Invalid password",
+      });
     }
 
     const token = createJWT(user);

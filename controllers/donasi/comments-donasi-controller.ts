@@ -4,7 +4,7 @@ import prisma from "../../database/config";
 export const createCommentDonasi = async (req: any, res: any) => {
   const { comment, postId } = req.body;
 
-
+  console.log(req.body);
   try {
     // find first post by id
     const post = await prisma.postDonasi.findFirst({
@@ -63,6 +63,9 @@ export const getCommentDonasi = async (req: any, res: any) => {
     const comments = await prisma.commentsDonasi.findMany({
       where: {
         postId: id,
+      },
+      include:{
+        author: true
       }
     });
 

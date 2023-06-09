@@ -106,8 +106,9 @@ export const getPostById = async (
 
 export const createPost = async (req: any, res: any) => {
   const { title, description, linkForm } = req.body;
-
+  console.log(req.body);
   let imgPath = imgPathGenerator(req, res);
+  // console.log(req.file)
 
   try {
     // create post based on authenticated author
