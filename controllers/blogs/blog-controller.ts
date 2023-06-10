@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 // interface UserPayload {
@@ -8,6 +8,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 // }
 
 export const getAllBlog = async (req: Request, res: Response) => {
+  const { userId } = req.query;
   try {
     const blogs = await prisma.blog.findMany({
       orderBy: {
@@ -20,10 +21,21 @@ export const getAllBlog = async (req: Request, res: Response) => {
             name: true,
             email: true,
             avatarImg: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
+
+    // get mine
+    if (userId) {
+      const mine = blogs.filter((blog) => blog.authorId === userId);
+      return res.status(200).json({
+        message: "Success fetch my blogs",
+        length: mine.length,
+        blogs: mine,
+      });
+    }
+
     res.status(200).json({
       length: blogs.length,
       blogs,
@@ -45,7 +57,7 @@ export const getBlogById = async (req: Request, res: Response) => {
             name: true,
             email: true,
             avatarImg: true,
-          }
+          },
         },
         comments: true,
       },
@@ -163,7 +175,7 @@ export const deleteBlog = async (req: any, res: any) => {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    if (findBlog?.authorId !== req.user.id) {
+    if (req.user.id !== findBlog?.authorId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const blog = await prisma.blog.delete({

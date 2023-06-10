@@ -16,57 +16,59 @@ const createJWT = (user: any) => {
       id: user.id,
       email: user.email,
     },
-    process.env.JWT_SECRET as string
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "72h",
+    }
   );
   return token;
 };
 
-// const protect = (req: any, res: Response, next: NextFunction) => {
-//   const bearer = req.headers.authorization;
+const protect = (req: any, res: Response, next: NextFunction) => {
+  const bearer = req.headers.authorization;
 
-//   if (!bearer) {
-//     return res.status(401).json({ message: "Unauthorized" });
-//   }
-
-//   const token = bearer.split(" ")[1].trim();
-
-//   if (!token) {
-//     return res.status(401).json({ message: "not valid token" });
-//   }
-
-//   try {
-//     const user = jwt.verify(token, process.env.JWT_SECRET as string);
-//     req.user = user;
-//     next();
-//   } catch (e) {
-//     console.error(e);
-//     res.status(401);
-//     res.json({ message: "not valid token" });
-//     return;
-//   }
-// };
-
-const protect = async (req: any, res: Response, next: NextFunction) => {
-  const token = req.cookies.access_token;
-  if (!token) {
+  if (!bearer) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
-    if (err) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+  const token = bearer.split(" ")[1].trim();
+
+  if (!token) {
+    return res.status(401).json({ message: "not valid token" });
+  }
+
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET as string);
     req.user = user;
     next();
-  })
-}
+  } catch (e) {
+    console.error(e);
+    res.status(401);
+    res.json({ message: "not valid token" });
+    return;
+  }
+};
+
+// const protect = async (req: any, res: Response, next: NextFunction) => {
+//   const token = req.cookies.access_token;
+//   if (!token) {
+//     return res.status(401).json({ message: "Unauthorized" });
+//   }
+
+//   jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
+//     if (err) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     req.user = user;
+//     next();
+//   })
+// }
 
 // signout user
 const signout = async (req: Request, res: Response) => {
   try {
     // delete token from authorization header
     const token = req.headers.authorization?.split(" ")[1];
-
     // if jwt token is valid, signout user
     if (token) {
       res.status(200).json({ message: "User signed out" });

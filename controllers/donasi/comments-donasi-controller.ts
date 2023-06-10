@@ -1,10 +1,10 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 
 export const createCommentDonasi = async (req: any, res: any) => {
   const { comment, postId } = req.body;
 
-
+  console.log(req.body);
   try {
     // find first post by id
     const post = await prisma.postDonasi.findFirst({
@@ -25,6 +25,18 @@ export const createCommentDonasi = async (req: any, res: any) => {
         postId,
         comment,
         authorId : req.user.id
+      }
+    });
+
+    // trigger increase comment count
+    await prisma.postDonasi.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        commentsCount:{
+          increment: 1
+        }
       }
     });
 
@@ -51,6 +63,9 @@ export const getCommentDonasi = async (req: any, res: any) => {
     const comments = await prisma.commentsDonasi.findMany({
       where: {
         postId: id,
+      },
+      include:{
+        author: true
       }
     });
 

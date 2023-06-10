@@ -1,6 +1,6 @@
 import { Router } from "express";
-import * as blogController from "../controllers/blog-controller";
-import protectRoute from "../middleware/protect-route";
+import * as blogController from "../../controllers/blogs/blog-controller";
+import protectRoute from "../../middleware/protect-route";
 const router = Router();
 
 // get all

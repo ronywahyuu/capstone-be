@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/config";
+import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export const getSavedBlog = async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ export const getSavedBlog = async (req: Request, res: Response) => {
   }
 };
 
-export const createSavedBlog = async (req: Request, res: Response) => {
+export const createSavedBlog = async (req: any, res: any) => {
   const { userId, blogId } = req.body;
   try {
     // if user already saved this post
@@ -53,6 +53,12 @@ export const createSavedBlog = async (req: Request, res: Response) => {
       });
     }
 
+    if (userId !== req.user.id) {
+      return res.status(400).json({
+        message: "User not authorized",
+      });
+    }
+
     const savedBlog = await prisma.savedBlog.create({
       data: {
         userId,
@@ -74,6 +80,58 @@ export const createSavedBlog = async (req: Request, res: Response) => {
 
     res.status(201).json({
       message: "Post saved",
+      data: savedBlog,
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const deleteSavedBlog = async (req: any, res: any) => {
+  const { userId, blogId } = req.body;
+  try {
+    // if user already saved this post
+    const user = await prisma.savedBlog.findFirst({
+      where: {
+        userId,
+        blogId,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User not saved this post",
+      });
+    }
+
+    if (userId !== req.user.id) {
+      return res.status(400).json({
+        message: "User not authorized",
+      });
+    }
+
+    const savedBlog = await prisma.savedBlog.delete({
+      where: {
+        id: user.id,
+      },
+    });
+
+    // trigger update saved count
+    await prisma.blog.update({
+      where: {
+        id: blogId,
+      },
+      data: {
+        savedCount: {
+          decrement: 1,
+        },
+      },
+    });
+
+    res.status(201).json({
+      message: "Post unsaved",
       data: savedBlog,
     });
   } catch (error) {
