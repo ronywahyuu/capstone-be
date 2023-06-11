@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "ts-node prisma/seed.ts",
-    "start" : "ts-node app.ts",
+    "start" : "node dist/app.js",
+    "build-prisma" : "tsc && npx prisma migrate deploy --schema=./prisma/schema.prisma && npx prisma generate --schema=./prisma/schema.prisma && npm start ",
     "dev": "nodemon --exec ts-node app.ts",
     "push-database" : "npx prisma db push",
     "reset-database" : "npx prisma migrate reset"

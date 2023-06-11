@@ -2,4 +2,9 @@ node_modules
 # Keep environment variables out of version control
 .env
 
-uploads/img/*
+# uploads/img/
+
+# ignore all file inside uploads/img/ directory but not the directory itself
+uploads/img/**/*
+
+dist
