@@ -9,7 +9,7 @@
     "start" : "node dist/app.js",
     "build-prisma" : "tsc && npx prisma migrate deploy --schema=./prisma/schema.prisma && npx prisma generate --schema=./prisma/schema.prisma && npm start ",
     "dev": "nodemon --exec ts-node app.ts",
-    "push-database" : "npx prisma db push",
+    "migrate-database" : "npx prisma migrate deploy --schema=./prisma/schema.prisma && npx prisma generate --schema=./prisma/schema.prisma",
     "reset-database" : "npx prisma migrate reset"
   },
   "keywords": [],
