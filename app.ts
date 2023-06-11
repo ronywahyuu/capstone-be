@@ -8,7 +8,7 @@ import path from "path";
 import { upload } from "./utils/storage-handler";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 8080;
 app.use(express.json());
 
 // use all origins
@@ -86,5 +86,5 @@ app.use(`${url}/protected`, protect, (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
