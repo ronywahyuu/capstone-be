@@ -122,13 +122,14 @@ const login = async (req: Request, res: Response) => {
         // sameSite: "none",
         // secure: true,
         sameSite: "none",
-        secure: true,
+        secure: false,
         maxAge : 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
         message: "User logged in successfully",
         user: userData,
+        token
       });
 
     // res
