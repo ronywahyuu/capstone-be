@@ -123,7 +123,6 @@ const login = async (req: Request, res: Response) => {
         // secure: true,
         sameSite: "none",
         secure: true,
-        domain: "https://127.0.0.1:5173",
         maxAge : 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
