@@ -45,8 +45,8 @@ import { protect } from "./utils/auth";
 
 // access control allow origin cors
 app.use(cors({
-  origin: "http://localhost:5173",
-  // origin: "*",
+  // origin: "http://localhost:5173",
+  origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
