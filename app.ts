@@ -57,7 +57,19 @@ app.use(cookieParser());
 //   credentials: true,
 // }));
 
-app.use(cors());
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    return res.status(200).json({});
+  }else{
+    next();
+  }
+});
+
+// cors
+app.use(cors())
 
 // define API v1 routes
 const url = "/api/v1";
