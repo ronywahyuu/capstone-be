@@ -111,6 +111,9 @@ const login = async (req: Request, res: Response) => {
     //   }
     // );
 
+    res.set('Access-Control-Allow-origin', req.headers.origin)
+    res.set('Access-Control-Allow-Credentials', 'true')
+
     const { password: userPassword, ...userData } = user;
 
     res
@@ -118,7 +121,7 @@ const login = async (req: Request, res: Response) => {
         httpOnly: true,
         // sameSite: "none",
         // secure: true,
-        sameSite: "lax",
+        sameSite: "strict",
         secure: true,
       })
       .status(200)
