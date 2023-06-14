@@ -44,12 +44,27 @@ import { protect } from "./utils/auth";
 // }))
 
 // access control allow origin cors
-app.use(cors({
-  // origin: "http://localhost:5173",
-  origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+// app.use(cors({
+//   // origin: "http://localhost:5173",
+//   origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true,
+// }));
+
+const corsOptions = {
+  origin: '*',
+  Credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 
 app.use(cookieParser());
 

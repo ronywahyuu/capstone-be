@@ -110,8 +110,8 @@ const login = async (req: Request, res: Response) => {
     //     expiresIn: "1m",
     //   }
     // );
-
-    // res.set('Access-Control-Allow-origin', req.headers.origin)
+    // white list
+    // res.set('Access-Control-Allow-Origin', 'https://togetherboost.vercel.app/')
     // res.set('Access-Control-Allow-Credentials', 'true')
 
     const { password: userPassword, ...userData } = user;
