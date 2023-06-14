@@ -51,20 +51,18 @@ import { protect } from "./utils/auth";
 //   credentials: true,
 // }));
 
+const whitelist = ['http://localhost:5173', 'https://togetherboost.vercel.app/'];
 const corsOptions = {
-  origin: '*',
-  Credentials: true,
-  optionsSuccessStatus: 200,
-};
+  credentials: true, // This is important.
+  origin: (origin: any, callback: any) => {
+    if(whitelist.includes(origin))
+      return callback(null, true)
+
+      callback(new Error('Not allowed by CORS'));
+  }
+}
+
 app.use(cors(corsOptions));
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
 
 app.use(cookieParser());
 
