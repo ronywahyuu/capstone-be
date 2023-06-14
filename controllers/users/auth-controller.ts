@@ -123,7 +123,6 @@ const login = async (req: Request, res: Response) => {
         // secure: true,
         sameSite: "none",
         secure: true,
-        domain: "localhost"
       })
       .status(200)
       .json({
