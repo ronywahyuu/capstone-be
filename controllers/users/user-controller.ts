@@ -3,6 +3,7 @@ import prisma from "../../database/config";
 import { User } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { imgPathGenerator } from "../../utils/helpers";
+import { uploadFirebase } from "../../middleware/upload-firebase";
 
 const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -15,6 +16,7 @@ const getUser = async (req: Request, res: Response) => {
         id: true,
         name: true,
         email: true,
+        profession: true,
         avatarImg: true,
         postDonasi: true,
         postBlog: true,
@@ -45,7 +47,8 @@ const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, email } = req.body;
 
-  let imgPath = imgPathGenerator(req, res);
+  // let imgPath = imgPathGenerator(req, res);
+  const imgUrl = await uploadFirebase(req.file)
 
   try {
     const user = await prisma.user.update({
@@ -55,7 +58,9 @@ const updateUser = async (req: Request, res: Response) => {
       data: {
         name,
         email,
-        avatarImg: imgPath,
+        avatarImg: imgUrl,
+        password: req.body.password,
+        profession: req.body.profession,
       },
     });
     res.status(200).json({

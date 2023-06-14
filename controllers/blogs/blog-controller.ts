@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { uploadFirebase } from "../../middleware/upload-firebase";
+import { deleteFiles } from "../../utils/delete-files";
 
 // interface UserPayload {
 //   id: string;
@@ -80,14 +82,16 @@ export const getBlogById = async (req: Request, res: Response) => {
 export const createBlog = async (req: any, res: any) => {
   const { title, body } = req.body;
   // const user = req.user as UserPayload;
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  // const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-  let bannerImg: string | undefined = undefined;
-  if (req.file) {
-    bannerImg = `${baseUrl}/${req.file.path}`;
-  }
+  // let bannerImg: string | undefined = undefined;
+  // if (req.file) {
+  //   bannerImg = `${baseUrl}/${req.file.path}`;
+  // }
 
-  const storeImg = bannerImg || null;
+  // const storeImg = bannerImg || null;
+
+  const bannerImg = await uploadFirebase(req.file);
 
   try {
     const blog = await prisma.blog.create({
@@ -95,7 +99,7 @@ export const createBlog = async (req: any, res: any) => {
         title,
         slug: title.toLowerCase().split(" ").join("-"),
         body,
-        bannerImg: storeImg,
+        bannerImg: bannerImg,
         authorId: req.user.id,
       },
     });
@@ -121,9 +125,11 @@ export const updateBlog = async (req: any, res: Response) => {
       },
     });
 
+    
     if (!findBlog) {
       return res.status(404).json({ message: "Blog not found" });
     }
+    await deleteFiles(findBlog?.bannerImg ?? "");
 
     if (findBlog?.authorId !== req.user.id) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -178,6 +184,9 @@ export const deleteBlog = async (req: any, res: any) => {
     if (req.user.id !== findBlog?.authorId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
+    await deleteFiles(findBlog?.bannerImg ?? "" )
+
     const blog = await prisma.blog.delete({
       where: {
         id: id,

@@ -10,6 +10,7 @@ const SchemaPostDonasiValidator = Joi.object({
     .pattern(/^\S.*\S$/)
     .pattern(/^[^0-9]*$/),
   slug: Joi.string(),
+  imgFile: Joi.string(),
   description: 
     Joi.string()
     .required()

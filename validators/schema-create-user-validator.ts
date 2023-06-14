@@ -11,7 +11,9 @@ const SchemaCreateUserValidator = Joi.object({
     .email(),
   password: Joi.string()
     .required()
-    .min(8)
+    .min(8),
+  profession: Joi.string()
+    .optional()
 });
 
 export default SchemaCreateUserValidator;
