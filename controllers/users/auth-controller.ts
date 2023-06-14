@@ -121,8 +121,8 @@ const login = async (req: Request, res: Response) => {
         httpOnly: true,
         // sameSite: "none",
         // secure: true,
-        sameSite: "none",
-        secure: true,
+        // sameSite: "none",
+        // secure: true,
         maxAge : 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
