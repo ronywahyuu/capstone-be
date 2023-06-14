@@ -118,7 +118,7 @@ const login = async (req: Request, res: Response) => {
         httpOnly: true,
         // sameSite: "none",
         // secure: true,
-        sameSite: "none",
+        sameSite: "lax",
         secure: true,
       })
       .status(200)

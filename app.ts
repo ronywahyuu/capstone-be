@@ -34,12 +34,6 @@ import likeBlogRoutes from "./routes/blogs/like-blog-routes";
 import userRoutes from "./routes/users/user-routes";
 import { protect } from "./utils/auth";
 
-// dotenv
-import dotenv from "dotenv";
-dotenv.config();
-
-app.use(bodyParser.json());
-app.use(cookieParser());
 
 // remove cookie from another domain
 // app.use(cors({
@@ -50,26 +44,15 @@ app.use(cookieParser());
 // }))
 
 // access control allow origin cors
-// app.use(cors({
-//   // origin: "http://localhost:5173",
-//   origin: "*",
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: "http://localhost:5173",
+  // origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res.status(200).json({});
-  }else{
-    next();
-  }
-});
+app.use(cookieParser());
 
-// cors
-app.use(cors())
 
 // define API v1 routes
 const url = "/api/v1";
@@ -78,9 +61,7 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Hello World!" });
 });
 
-app.get('/test', (req, res) => {
-  res.send(process.env.FIREBASE_API_KEY)
-});
+
 
 // app.use(upload("img"));
 
