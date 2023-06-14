@@ -5,10 +5,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import bodyParser from "body-parser";
 import path from "path";
-import { upload } from "./utils/storage-handler";
+// import { upload } from "./utils/storage-handler";
 
 const app = express();
-const port = 3000;
+const port = 8080;
 app.use(express.json());
 
 // use all origins
@@ -33,6 +33,10 @@ import likeBlogRoutes from "./routes/blogs/like-blog-routes";
 // =================== ROUTES USERS ===================
 import userRoutes from "./routes/users/user-routes";
 import { protect } from "./utils/auth";
+
+// dotenv
+import dotenv from "dotenv";
+dotenv.config();
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -60,7 +64,16 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Hello World!" });
 });
 
-app.use(upload("img"));
+app.get('/test', (req, res) => {
+  res.send(process.env.FIREBASE_API_KEY)
+});
+
+// app.use(upload("img"));
+
+// app.use(upload.single("img"))
+import upload from "./utils/storage-handler"
+
+app.use(upload.single("imgFile"))
 
 // access media files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

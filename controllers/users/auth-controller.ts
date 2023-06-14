@@ -3,10 +3,11 @@ import prisma from "../../database/config";
 import { createJWT, hashPassword } from "../../utils/auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { uploadFirebase } from "../../middleware/upload-firebase";
 
 const register = async (req: any, res: any) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, profession } = req.body;
 
     // find if user already exists
     const userExists = await prisma.user.findUnique({
@@ -22,22 +23,23 @@ const register = async (req: any, res: any) => {
       });
     }
 
-    const baseUrl = req.protocol + "://" + req.get("host");
+    // const baseUrl = req.protocol + "://" + req.get("host");
 
-    let avatarImgPath: string | undefined;
-    // avatar image path
-    if (req.file) {
-      avatarImgPath = baseUrl + "/uploads/img/" + req.file?.filename;
-    }
+    // let avatarImgPath: string | undefined;
+    // // avatar image path
+    // if (req.file) {
+    //   avatarImgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+    // }
 
-    // const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
-    const defaultAvatarImg = baseUrl + "/uploads/default-avatar.png";
+    // // const defaultAvatarImg = "https://i.imgur.com/6VBx3io.png";
+    // const defaultAvatarImg = baseUrl + "/uploads/default-avatar.png";
     // const pathToAvatarImg = avatarImg ? avatarImg.path : defaultAvatarImg;
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        avatarImg: avatarImgPath || defaultAvatarImg,
+        profession,
+        avatarImg: await uploadFirebase(req.file) || "https://www.w3schools.com/howto/img_avatar.png",
         password: await hashPassword(password),
       },
     });
@@ -114,6 +116,8 @@ const login = async (req: Request, res: Response) => {
     res
       .cookie("access_token", token, {
         httpOnly: true,
+        // sameSite : "none",
+        // secure: true,
       })
       .status(200)
       .json({

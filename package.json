@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "ts-node prisma/seed.ts",
     "dev": "nodemon --exec ts-node app.ts",
-    "push-database" : "npx prisma db push",
-    "reset-database" : "npx prisma migrate reset"
+    "push-database": "npx prisma db push",
+    "reset-database": "npx prisma migrate reset"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +34,9 @@
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
     "express": "^4.18.2",
+    "firebase": "^9.22.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "multer": "^1.4.5-lts.1"

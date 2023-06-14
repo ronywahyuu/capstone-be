@@ -1,12 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../database/config";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { imgPathGenerator } from "../../utils/helpers";
+// import { imgPathGenerator } from "../../utils/helpers";
 import { PostDonasi } from "@prisma/client";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "@firebase/storage";
+import { initializeApp } from "@firebase/app";
+// import { uploadFirebase } from "../../middleware/upload-firebase";
+import config from "../../database/firebase.config";
+import { uploadFirebase } from "../../middleware/upload-firebase";
+import { deleteFiles } from "../../utils/delete-files";
 export const getAllPosts = async (req: Request, res: Response) => {
   // query
   // const { page, limit } = req.query;
-  const {userId} = req.query;
+  const { userId } = req.query;
   try {
     // const posts = await prisma.postDonasi.findMany({});
 
@@ -106,9 +117,6 @@ export const getPostById = async (
 
 export const createPost = async (req: any, res: any) => {
   const { title, description, linkForm } = req.body;
-  console.log(req.body);
-  let imgPath = imgPathGenerator(req, res);
-  // console.log(req.file)
 
   try {
     // create post based on authenticated author
@@ -118,7 +126,7 @@ export const createPost = async (req: any, res: any) => {
         slug: title.toLowerCase().split(" ").join("-"),
         description,
         linkForm,
-        bannerImg: imgPath,
+        bannerImg: await uploadFirebase(req.file),
         authorId: req.user.id,
       },
     });
@@ -151,13 +159,16 @@ export const updatePost = async (req: any, res: any) => {
       res.status(401).json({ message: "Unauthorized" });
     }
 
-    const baseUrl = req.protocol + "://" + req.get("host");
+    await deleteFiles(post?.bannerImg ?? "");
 
-    let imgPath: string | undefined;
-    // avatar image path
-    if (req.file) {
-      imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
-    }
+    // const baseUrl = req.protocol + "://" + req.get("host");
+
+    // let imgPath: string | undefined;
+    // // avatar image path
+    // if (req.file) {
+    //   imgPath = baseUrl + "/uploads/img/" + req.file?.filename;
+    // }
+    const imgUrl = await uploadFirebase(req.file);
 
     const updatedPost = await prisma.postDonasi.update({
       where: {
@@ -168,7 +179,7 @@ export const updatePost = async (req: any, res: any) => {
         slug: title.toLowerCase().split(" ").join("-"),
         description,
         linkForm,
-        bannerImg: imgPath,
+        bannerImg: imgUrl,
       },
     });
 
@@ -194,6 +205,7 @@ export const deletePost = async (req: any, res: any) => {
       },
     });
 
+
     if (!post) {
       res.status(404).json({ message: "Post not found" });
       return;
@@ -208,6 +220,8 @@ export const deletePost = async (req: any, res: any) => {
         id: id,
       },
     });
+
+    await deleteFiles(post?.bannerImg ?? "")
 
     res.status(200).json({ message: "Post deleted" });
   } catch (err) {
