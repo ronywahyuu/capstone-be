@@ -14,6 +14,7 @@ import { initializeApp } from "@firebase/app";
 import config from "../../database/firebase.config";
 import { uploadFirebase } from "../../middleware/upload-firebase";
 import { deleteFiles } from "../../utils/delete-files";
+import multer from "multer";
 export const getAllPosts = async (req: Request, res: Response) => {
   // query
   // const { page, limit } = req.query;
@@ -132,10 +133,14 @@ export const createPost = async (req: any, res: any) => {
     });
 
     res.status(201).json(post);
-  } catch (error) {
+  } catch (error: any) {
+    if(error instanceof multer.MulterError){
+      res.status(400).json({ message: error.message });
+    }
     if (error instanceof PrismaClientKnownRequestError) {
       res.status(500).json({ message: error.message });
     }
+
   }
 };
 
@@ -205,7 +210,6 @@ export const deletePost = async (req: any, res: any) => {
       },
     });
 
-
     if (!post) {
       res.status(404).json({ message: "Post not found" });
       return;
@@ -221,7 +225,7 @@ export const deletePost = async (req: any, res: any) => {
       },
     });
 
-    await deleteFiles(post?.bannerImg ?? "")
+    await deleteFiles(post?.bannerImg ?? "");
 
     res.status(200).json({ message: "Post deleted" });
   } catch (err) {

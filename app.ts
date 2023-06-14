@@ -72,11 +72,28 @@ app.get('/test', (req, res) => {
 
 // app.use(upload.single("img"))
 import upload from "./utils/storage-handler"
+import multer from "multer";
+
+const multerError = (error: any, req: any, res: any, next: any) => {
+  if (error instanceof multer.MulterError) {
+    res.status(400).json({
+      error: true,
+      message: error.message,
+    });
+  }
+  res.status(400).json({
+    error: true,
+    message: error.message,
+  });
+
+  next();
+}
 
 app.use(upload.single("imgFile"))
+app.use(multerError);
 
 // access media files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // user
 app.use(`${url}/users`, userRoutes);

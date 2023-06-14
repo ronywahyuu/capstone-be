@@ -15,18 +15,18 @@ import multer from "multer";
 //   });
 // };
 
-// // file filter
-// const fileFilter = (req: any, file: any, cb: any) => {
-//   if (
-//     file.mimetype === "image/jpg" ||
-//     file.mimetype === "image/jpeg" ||
-//     file.mimetype === "image/png"
-//   ) {
-//     cb(null, true);
-//   } else {
-//     cb(new Error("File format not supported"), false);
-//   }
-// };
+// file filter
+const fileFilter = (req: any, file: any, cb: any) => {
+  if (
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/png"
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error("File format not supported"), false);
+  }
+};
 
 // export const upload = (type: string) => {
 //   return multer({ storage: imgStorage(type), fileFilter }).single("imgFile");
@@ -34,6 +34,11 @@ import multer from "multer";
 
 const upload = multer({
   storage: multer.memoryStorage(),
+  fileFilter,
+  limits: {
+    // 1 MB
+    fileSize: 1024 * 1024 * 1,
+  },
 })
 
 export default upload;
