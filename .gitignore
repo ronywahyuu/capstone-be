@@ -7,4 +7,6 @@ node_modules
 # ignore all file inside uploads/img/ directory but not the directory itself
 uploads/img/**/*
 
+uploads/avatar/**/*
+
 dist

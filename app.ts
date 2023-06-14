@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import bodyParser from "body-parser";
 import path from "path";
-import { upload } from "./utils/storage-handler";
+// import { upload } from "./utils/storage-handler";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -34,6 +34,10 @@ import likeBlogRoutes from "./routes/blogs/like-blog-routes";
 import userRoutes from "./routes/users/user-routes";
 import { protect } from "./utils/auth";
 
+// dotenv
+import dotenv from "dotenv";
+dotenv.config();
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -60,10 +64,36 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Hello World!" });
 });
 
-app.use(upload("img"));
+app.get('/test', (req, res) => {
+  res.send(process.env.FIREBASE_API_KEY)
+});
+
+// app.use(upload("img"));
+
+// app.use(upload.single("img"))
+import upload from "./utils/storage-handler"
+import multer from "multer";
+
+const multerError = (error: any, req: any, res: any, next: any) => {
+  if (error instanceof multer.MulterError) {
+    res.status(400).json({
+      error: true,
+      message: error.message,
+    });
+  }
+  res.status(400).json({
+    error: true,
+    message: error.message,
+  });
+
+  next();
+}
+
+app.use(upload.single("imgFile"))
+app.use(multerError);
 
 // access media files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // user
 app.use(`${url}/users`, userRoutes);
