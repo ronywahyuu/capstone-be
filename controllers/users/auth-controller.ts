@@ -120,7 +120,6 @@ const login = async (req: Request, res: Response) => {
         // secure: true,
         sameSite: "none",
         secure: true,
-        domain: "capstone-be-production-77ef.up.railway.app",
       })
       .status(200)
       .json({
