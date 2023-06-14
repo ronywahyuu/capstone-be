@@ -111,8 +111,8 @@ const login = async (req: Request, res: Response) => {
     //   }
     // );
 
-    res.set('Access-Control-Allow-origin', req.headers.origin)
-    res.set('Access-Control-Allow-Credentials', 'true')
+    // res.set('Access-Control-Allow-origin', req.headers.origin)
+    // res.set('Access-Control-Allow-Credentials', 'true')
 
     const { password: userPassword, ...userData } = user;
 
@@ -123,12 +123,13 @@ const login = async (req: Request, res: Response) => {
         // secure: true,
         sameSite: "none",
         secure: true,
+        domain: "https://127.0.0.1:5173",
+        maxAge : 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
         message: "User logged in successfully",
         user: userData,
-        token,
       });
 
     // res
