@@ -50,13 +50,14 @@ app.use(cookieParser());
 // }))
 
 // access control allow origin cors
-app.use(cors({
-  // origin: "http://localhost:5173",
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+// app.use(cors({
+//   // origin: "http://localhost:5173",
+//   origin: "*",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true,
+// }));
 
+app.use(cors());
 
 // define API v1 routes
 const url = "/api/v1";
