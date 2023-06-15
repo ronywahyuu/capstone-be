@@ -110,22 +110,26 @@ const login = async (req: Request, res: Response) => {
     //     expiresIn: "1m",
     //   }
     // );
+    // white list
+    // res.set('Access-Control-Allow-Origin', 'https://togetherboost.vercel.app/')
+    // res.set('Access-Control-Allow-Credentials', 'true')
 
     const { password: userPassword, ...userData } = user;
 
     res
       .cookie("access_token", token, {
         httpOnly: true,
-        // samSite: "none",
+        // sameSite: "none",
         // secure: true,
         sameSite: "none",
         secure: true,
+        maxAge : 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
         message: "User logged in successfully",
         user: userData,
-        token,
+        token
       });
 
     // res

@@ -34,12 +34,6 @@ import likeBlogRoutes from "./routes/blogs/like-blog-routes";
 import userRoutes from "./routes/users/user-routes";
 import { protect } from "./utils/auth";
 
-// dotenv
-import dotenv from "dotenv";
-dotenv.config();
-
-app.use(bodyParser.json());
-app.use(cookieParser());
 
 // remove cookie from another domain
 // app.use(cors({
@@ -50,11 +44,28 @@ app.use(cookieParser());
 // }))
 
 // access control allow origin cors
-app.use(cors({
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+// app.use(cors({
+//   // origin: "http://localhost:5173",
+//   origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true,
+// }));
+
+const whitelist = ['https://togetherboost.vercel.app'];
+const corsOptions = {
+  credentials: true, // This is important.
+  origin: (origin: any, callback: any) => {
+    if(whitelist.includes(origin))
+      return callback(null, true)
+
+      callback(new Error('Not allowed by CORS'));
+  }
+}
+
+app.use(cors(corsOptions));
+
+
+app.use(cookieParser());
 
 
 // define API v1 routes
@@ -64,9 +75,7 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Hello World!" });
 });
 
-app.get('/test', (req, res) => {
-  res.send(process.env.FIREBASE_API_KEY)
-});
+
 
 // app.use(upload("img"));
 
