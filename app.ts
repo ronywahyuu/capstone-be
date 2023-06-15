@@ -51,7 +51,7 @@ import { protect } from "./utils/auth";
 //   credentials: true,
 // }));
 
-const whitelist = ['https://togetherboost.vercel.app'];
+const whitelist = ['http://localhost:5173'];
 const corsOptions = {
   credentials: true, // This is important.
   origin: (origin: any, callback: any) => {
