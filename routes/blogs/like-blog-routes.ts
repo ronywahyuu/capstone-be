@@ -15,5 +15,6 @@ router.get("/", protectRoute, likeBlogController.getLikeBlogByUser);
 // delete like blog
 router.delete("/", protectRoute, likeBlogController.deleteLikeBlog);
 
+router.get('/', protectRoute, likeBlogController.getLikeBlogByUser);
 
 export default router;

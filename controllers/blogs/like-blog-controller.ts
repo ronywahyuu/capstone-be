@@ -166,3 +166,43 @@ export const deleteLikeBlog = async (req: any, res: any) => {
     }
   }
 };
+
+export const getLikeBlogByUser = async (req: any, res: any) => {
+  const { userId } = req.query;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if(req.user.id !== userId) {
+      res.status(401).json({ message: "You are not allowed to get this like" });
+      return;
+    }
+
+    const likes = await prisma.likeBlog.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    res.status(200).json({
+      message: "Get Like Blog By User",
+      likes,
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({
+        error: true,
+        message: error.message,
+      });
+    }
+  }
+}
