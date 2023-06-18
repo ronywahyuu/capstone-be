@@ -67,6 +67,22 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
+// const whitelist = ['https://togetherboost.vercel.app'];
+// const corsOptions = {
+//   credentials: true, // This is important.
+//   origin: (origin: any, callback: any) => {
+//     if(whitelist.includes(origin))
+//       return callback(null, true)
+
+//       callback(new Error('Not allowed by CORS'));
+//   }
+// }
+
+// app.use(cors(corsOptions));
+
+
+app.use(cookieParser());
+
 
 // define API v1 routes
 const url = "/api/v1";

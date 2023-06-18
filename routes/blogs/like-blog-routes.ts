@@ -9,8 +9,12 @@ router.post("/", protectRoute, likeBlogController.createLikeBlog);
 // get like blog
 router.get("/:id", likeBlogController.getLikeBlog);
 
+// like blog by user
+router.get("/", protectRoute, likeBlogController.getLikeBlogByUser);
+
 // delete like blog
 router.delete("/", protectRoute, likeBlogController.deleteLikeBlog);
 
+router.get('/', protectRoute, likeBlogController.getLikeBlogByUser);
 
 export default router;

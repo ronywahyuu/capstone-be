@@ -5,6 +5,7 @@ import * as userController from "../../controllers/users/user-controller";
 import multer from "multer";
 import validate from "../../middleware/validate";
 import SchemaCreateUserValidator from "../../validators/schema-create-user-validator";
+import protectRoute from "../../middleware/protect-route";
 
 
 const router = Router();
@@ -22,6 +23,6 @@ router.post("/refresh-token", authController.refreshToken);
 router.get("/:id", userController.getUser);
 
 // update user
-router.put("/:id", userController.updateUser);
+router.put("/:id", protectRoute, userController.updateUser);
 
 export default router;

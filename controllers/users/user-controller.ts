@@ -4,6 +4,8 @@ import { User } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { imgPathGenerator } from "../../utils/helpers";
 import { uploadFirebase } from "../../middleware/upload-firebase";
+import { hashPassword } from "../../utils/auth";
+import { deleteFiles } from "../../utils/delete-files";
 
 const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -43,14 +45,24 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: any, res: any) => {
   const { id } = req.params;
-  const { name, email } = req.body;
+  const { name, email, password } = req.body;
 
   // let imgPath = imgPathGenerator(req, res);
-  const imgUrl = await uploadFirebase(req.file)
-
+  
   try {
+
+    if(req.user.id !== id){
+      return res.status(401).json({ message: "You are not authorized to update this user" });
+    }
+
+    // delee old image
+    if (req.file) {
+      await deleteFiles(req.user.avatarImg ?? "");
+    }
+
+    const imgUrl = await uploadFirebase(req.file)
     const user = await prisma.user.update({
       where: {
         id: id,
@@ -58,8 +70,8 @@ const updateUser = async (req: Request, res: Response) => {
       data: {
         name,
         email,
-        avatarImg: imgUrl,
-        password: req.body.password,
+        ...(imgUrl && { avatarImg: imgUrl }),
+        ...(password && { password: await hashPassword(password) }),
         profession: req.body.profession,
       },
     });

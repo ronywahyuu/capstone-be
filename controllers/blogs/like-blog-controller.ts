@@ -4,7 +4,7 @@ import prisma from "../../database/config";
 export const createLikeBlog = async (req: any, res: any) => {
   const { userId, blogId } = req.body;
   try {
-    const blog = await prisma.blog.findFirst({
+    const blog = await prisma.blog.findUnique({
       where: {
         id: blogId,
       },
@@ -24,6 +24,7 @@ export const createLikeBlog = async (req: any, res: any) => {
     const user = await prisma.likeBlog.findFirst({
       where: {
         userId,
+        blogId,
       },
     });
 
@@ -36,7 +37,7 @@ export const createLikeBlog = async (req: any, res: any) => {
     const like = await prisma.likeBlog.create({
       data: {
         blogId,
-        userId: req.user.id,
+        userId
       },
     });
 
@@ -165,3 +166,43 @@ export const deleteLikeBlog = async (req: any, res: any) => {
     }
   }
 };
+
+export const getLikeBlogByUser = async (req: any, res: any) => {
+  const { userId } = req.query;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if(req.user.id !== userId) {
+      res.status(401).json({ message: "You are not allowed to get this like" });
+      return;
+    }
+
+    const likes = await prisma.likeBlog.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    res.status(200).json({
+      message: "Get Like Blog By User",
+      likes,
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      res.status(500).json({
+        error: true,
+        message: error.message,
+      });
+    }
+  }
+}

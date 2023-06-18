@@ -119,7 +119,7 @@ const login = async (req: Request, res: Response) => {
     res
       .cookie("access_token", token, {
         httpOnly: true,
-        // sameSite: "none",
+        // samSite: "none",
         // secure: true,
         sameSite: "none",
         secure: true,
