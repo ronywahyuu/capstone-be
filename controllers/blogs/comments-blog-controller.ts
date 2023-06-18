@@ -51,8 +51,8 @@ export const createCommentBlog = async (req: any, res: any) => {
 };
 
 export const getCommentBlog = async (req: Request, res: Response) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const blog = await prisma.blog.findFirst({
       where: {
         id,
@@ -68,6 +68,9 @@ export const getCommentBlog = async (req: Request, res: Response) => {
       where: {
         blogId: id,
       },
+      include: {
+        author: true
+      }
     });
 
     res.status(200).json({

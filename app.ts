@@ -44,25 +44,25 @@ import { protect } from "./utils/auth";
 // }))
 
 // access control allow origin cors
-// app.use(cors({
-//   // origin: "http://localhost:5173",
-//   origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: "http://localhost:5173",
+  // origin: ["https://togetherboost.vercel.app/", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
-const whitelist = ['https://togetherboost.vercel.app'];
-const corsOptions = {
-  credentials: true, // This is important.
-  origin: (origin: any, callback: any) => {
-    if(whitelist.includes(origin))
-      return callback(null, true)
+// const whitelist = ['https://togetherboost.vercel.app'];
+// const corsOptions = {
+//   credentials: true, // This is important.
+//   origin: (origin: any, callback: any) => {
+//     if(whitelist.includes(origin))
+//       return callback(null, true)
 
-      callback(new Error('Not allowed by CORS'));
-  }
-}
+//       callback(new Error('Not allowed by CORS'));
+//   }
+// }
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 
 app.use(cookieParser());

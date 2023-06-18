@@ -39,7 +39,11 @@ export const createSavedBlog = async (req: any, res: any) => {
         message: "User already saved this post",
       });
     }
-
+    if (userId !== req.user.id) {
+      return res.status(400).json({
+        message: "User not authorized",
+      });
+    }
     // if post not created yet
     const post = await prisma.blog.findUnique({
       where: {
@@ -53,17 +57,14 @@ export const createSavedBlog = async (req: any, res: any) => {
       });
     }
 
-    if (userId !== req.user.id) {
-      return res.status(400).json({
-        message: "User not authorized",
-      });
-    }
-
     const savedBlog = await prisma.savedBlog.create({
       data: {
         userId,
         blogId,
       },
+      include: {
+        blog: true,
+      }
     });
 
     // trigger update saved count
@@ -79,7 +80,7 @@ export const createSavedBlog = async (req: any, res: any) => {
     });
 
     res.status(201).json({
-      message: "Post saved",
+      message: "Post Blog saved",
       data: savedBlog,
     });
   } catch (error) {

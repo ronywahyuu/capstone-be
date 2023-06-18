@@ -96,7 +96,8 @@ export const createSavedDonasi = async (req: any, res: any) => {
       },
     });
 
-    res.status(200).json({
+    res.status(201).json({
+      message: "Post Donasi saved",
       data: savedDonasi,
     });
   } catch (error: any) {

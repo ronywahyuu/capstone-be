@@ -4,7 +4,7 @@ import prisma from "../../database/config";
 export const createLikeBlog = async (req: any, res: any) => {
   const { userId, blogId } = req.body;
   try {
-    const blog = await prisma.blog.findFirst({
+    const blog = await prisma.blog.findUnique({
       where: {
         id: blogId,
       },
@@ -24,6 +24,7 @@ export const createLikeBlog = async (req: any, res: any) => {
     const user = await prisma.likeBlog.findFirst({
       where: {
         userId,
+        blogId,
       },
     });
 
@@ -36,7 +37,7 @@ export const createLikeBlog = async (req: any, res: any) => {
     const like = await prisma.likeBlog.create({
       data: {
         blogId,
-        userId: req.user.id,
+        userId
       },
     });
 
